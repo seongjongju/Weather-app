@@ -11,7 +11,7 @@ const Weather = () => {
     if(storeRecent) {
       setRecent(JSON.parse(storeRecent));
     }
-  }, [recent])
+  }, [])
 
   const cityNameChange = (e) => {
     setCity(e.target.value);
