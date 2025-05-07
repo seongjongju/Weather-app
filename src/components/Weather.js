@@ -83,23 +83,13 @@ const Weather = () => {
   };
 
   const getWeatherName = async (city) => {
-    try {
-      const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=kr`;
+    const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=kr`;
 
-      const response = await fetch(url);
+    const response = await fetch(url);
 
-      if(!response.ok) {
-        throw new Error('도시를 찾을 수 없습니다.');
-      }
-
-      const data = await response.json();
-      setWeather(data);
-      setError(null);
-    } catch (err) {
-      setWeather(null);
-      setError(err.message);
-    }
+    const data = await response.json();
+    setWeather(data);
   };
 
   return (
