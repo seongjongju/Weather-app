@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 const Weather = () => {
   const [city, setCity] = useState('');
@@ -24,7 +25,7 @@ const Weather = () => {
 
     try {
       const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric&lang=kr`;
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=kr`;
 
       const response = await fetch(url);
 
@@ -65,25 +66,26 @@ const Weather = () => {
 
     const updatedRecent = [...recent];
 
-    if (recent.includes(weather.name)) {
-      const filteredRecent = updatedRecent.filter(city => city !== weather.name);
+    const exists = updatedRecent.find(city => city.name === weather.name);
+
+    if (exists) {
+      const filteredRecent = updatedRecent.filter(city => city.name !== weather.name);
       setRecent(filteredRecent);
       localStorage.setItem('recent', JSON.stringify(filteredRecent));
     } else {
-
-      if (updatedRecent.length >= 5) {
-        updatedRecent.shift(); 
-      }
-      updatedRecent.push(weather.name);
+      const newCity = {id: uuidv4(), name: weather.name};
+      updatedRecent.push(newCity);
       setRecent(updatedRecent);
       localStorage.setItem('recent', JSON.stringify(updatedRecent));
     }
+
+    console.log(updatedRecent);
   };
 
   const getWeatherName = async (city) => {
     try {
       const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric&lang=kr`;
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=kr`;
 
       const response = await fetch(url);
 
@@ -114,8 +116,8 @@ const Weather = () => {
           />
           <button className='search-wrap__button'>Search</button>
         </form>
-        {recent.map((recentItem, index) => (
-          <span key={index} className='recent-list' onClick={() => getWeatherName(recentItem)}>{recentItem}</span>
+        {recent.map((recentItem) => (
+          <span key={recentItem.id} className='recent-list' onClick={() => getWeatherName(recentItem.name)}>{recentItem.name}</span>
         ))}
       </div>
 
@@ -123,7 +125,7 @@ const Weather = () => {
       {weather && (
         <div className='weather-wrap' style={weatherStyle}>
           <span className='weather-wrap__button' onClick={recentUpdate}>
-            {recent.includes(weather.name) ? '★' : '☆'}
+            {recent.find(city => city.name === weather.name) ? '★' : '☆'}
           </span>
           <h2 className='weather-wrap--title'>{weather.name}</h2>
           <p className='weather-wrap--weather'>{weather.weather[0].description}</p>
